@@ -25,15 +25,23 @@ const handleUserSettings = (event) => {
     ];
     sendQuickReplyMessage(replyToken, `「${userMessage}カップ」の「以上」または「以下」を選択してください。`, items);
   } else if (userMessage.endsWith('以上') || userMessage.endsWith('以下')) {
-    saveUserSetting(userId, userMessage);
+    updateUserSetting(userId, userMessage);
     const items = [
       { type: 'action', action: { type: 'message', label: 'OK', text: 'OK' } },
       { type: 'action', action: { type: 'message', label: 'やり直す', text: 'やり直す' } }
     ];
-    sendQuickReplyMessage(replyToken, `あなたの選択は「${userMessage.replace('以上', 'カップ以上').replace('以下', 'カップ以下')}」です！このまま登録しますか？`, items);
+    sendQuickReplyMessage(replyToken, `「${userMessage.replace('以上', 'カップ以上').replace('以下', 'カップ以下')}」で、このまま登録しますか？`, items);
   } else if (userMessage === 'OK') {
-    sendTextMessage(replyToken, `設定画完了しました！毎日12時くらいに出勤情報を通知します🔔`);
+    sendTextMessage(replyToken, `設定が完了しました！\n\n🔔 毎日12時くらいに出勤情報を通知します\n\n☑️ 条件を編集したい場合は「/edit」と送信してください\n☑ #tekotter で、SNSにぜひシェアしてください`);
   } else if (userMessage === 'やり直す') {
     sendQuickReplyMessage(replyToken, 'お好みのカップ数を選択してください。', createCupOptions());
+  } else if (userMessage === '/edit') {
+    const currentSetting = getCurrentUserSetting(userId);
+    sendQuickReplyMessage(replyToken, `現在の設定は「${currentSetting}」です。編集しますか？`, [
+      { type: 'action', action: { type: 'message', label: 'はい', text: 'はい' } },
+      { type: 'action', action: { type: 'message', label: 'いいえ', text: 'いいえ' } }
+    ]);
+  } else if (userMessage === 'はい') {
+    sendQuickReplyMessage(replyToken, '新しいカップ数を選択してください。', createCupOptions());
   }
 };
