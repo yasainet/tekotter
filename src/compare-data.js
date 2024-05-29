@@ -1,8 +1,3 @@
-function testCompareUserSettingsWithCastData() {
-  const notifications = compareUserSettingsWithCastData();
-  Logger.log(`Notifications: ${JSON.stringify(notifications)}`);
-}
-
 function compareUserSettingsWithCastData(batchSize = 100) {
   const userSettingsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('UserSettings');
   const castDataSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('CurrentCastData');

@@ -1,3 +1,11 @@
+function clearSheetData() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('CurrentCastData');
+  const lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).clearContent();
+  }
+}
+
 function saveData(storeId, data) {
   const timestamp = new Date().toISOString();
   const rows = data.map(item => ({

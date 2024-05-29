@@ -1,49 +1,46 @@
-function testCompareUserSettingsWithCastData() {
-  const notifications = compareUserSettingsWithCastData();
-  Logger.log(`Notifications: ${JSON.stringify(notifications)}`);
-}
-
-
 function notifyUsers() {
   const notifications = compareUserSettingsWithCastData();
-  const groupedNotifications = groupNotificationsByStore(notifications);
+  const groupedNotifications = groupNotificationsByUser(notifications);
 
-  groupedNotifications.forEach((storeNotification) => {
-    const { storeName, casts } = storeNotification;
-    let message = `今日の出勤情報が\n更新されたテコッ❗️\n\n${storeName}\n`;
+  groupedNotifications.forEach((userNotification) => {
+    const { userId, stores } = userNotification;
+    let message = `今日の出勤情報が\n更新されたテコッ❗️\n\n`;
 
-    casts.forEach(cast => {
-      const { name, age, height, castCup, schedule } = cast;
-      message += `${name}（${age}）\n${height} / ${castCup}カップ\n${schedule}\n\n`;
+    stores.forEach(store => {
+      const { storeName, casts } = store;
+      message += `${storeName}\n\n`;
+
+      casts.forEach(cast => {
+        const { name, age, height, castCup, schedule } = cast;
+        message += `${name}（${age}）\n${height} / ${castCup}カップ\n${schedule}\n\n`;
+      });
     });
 
     // デバッグ用のログ出力
-    Logger.log(`Sending message to store: ${storeName}\nMessage: ${message.trim()}`);
-    
-    // ユーザーIDが正しいか確認
-    casts.forEach(cast => {
-      const { userId } = cast;
-      Logger.log(`Sending message to user: ${userId}`);
-      sendLineMessage(userId, message.trim());
-    });
+    Logger.log(`Sending message to user: ${userId}\nMessage: ${message.trim()}`);
+    sendLineMessage(userId, message.trim());
   });
 }
 
-function groupNotificationsByStore(notifications) {
+function groupNotificationsByUser(notifications) {
   const grouped = {};
 
   notifications.forEach(notification => {
-    const { storeName, name, age, height, castCup, schedule, userId } = notification;
-    if (!grouped[storeName]) {
-      grouped[storeName] = [];
+    const { userId, storeName, name, age, height, castCup, schedule } = notification;
+    if (!grouped[userId]) {
+      grouped[userId] = { userId, stores: [] };
     }
-    grouped[storeName].push({ name, age, height, castCup, schedule, userId });
+
+    let store = grouped[userId].stores.find(store => store.storeName === storeName);
+    if (!store) {
+      store = { storeName, casts: [] };
+      grouped[userId].stores.push(store);
+    }
+
+    store.casts.push({ name, age, height, castCup, schedule });
   });
 
-  return Object.keys(grouped).map(storeName => ({
-    storeName,
-    casts: grouped[storeName]
-  }));
+  return Object.keys(grouped).map(userId => grouped[userId]);
 }
 
 function sendLineMessage(userId, message) {

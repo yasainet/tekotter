@@ -1,4 +1,4 @@
-function testFetchAndSaveCastData() {
+function FetchAndSaveCastData() {
   const storeIds = getStoreIds(); // StoreLists シートから storeId を取得
   const headers = {}; // 必要に応じてヘッダーを設定
   const delay = 3000; // 遅延時間
@@ -6,9 +6,6 @@ function testFetchAndSaveCastData() {
   const result = fetchCastDataWithDelay(storeIds, headers, delay);
   Logger.log(result);
 }
-
-
-
 
 function getStoreIds() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('StoreLists');
@@ -53,6 +50,8 @@ function fetchHtmlContent(url, headers = {}) {
 }
 
 function fetchCastDataWithDelay(storeIds, headers = {}, delay = 3000) {
+  clearSheetData(); // データをクリア
+
   const storeData = [];
   for (let i = 0; i < storeIds.length; i++) {
     const storeId = storeIds[i];
